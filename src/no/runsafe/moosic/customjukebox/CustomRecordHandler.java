@@ -55,7 +55,9 @@ public class CustomRecordHandler implements IConfigurationChanged, IPlayerRightC
 		if (usingItem == null || !usingItem.is(Item.Special.Crafted.EnchantedBook) || !isCustomRecord(usingItem))
 			return true;
 
-		((IJukebox) targetBlock).eject();
+		if (((IJukebox) targetBlock).isPlaying())
+			((IJukebox) targetBlock).eject();
+
 		player.removeExactItem(usingItem, 1);
 		jukebox = playJukebox(player, new CustomJukebox(blockLocation, usingItem));
 		repository.storeJukebox(blockLocation, usingItem);
