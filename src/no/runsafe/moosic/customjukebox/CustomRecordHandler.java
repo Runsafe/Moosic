@@ -42,34 +42,25 @@ public class CustomRecordHandler implements IConfigurationChanged, IPlayerRightC
 	public boolean OnPlayerRightClick(IPlayer player, RunsafeMeta usingItem, IBlock targetBlock)
 	{
 		ILocation blockLocation = targetBlock.getLocation();
-		if (targetBlock instanceof IJukebox)
+		if (!(targetBlock instanceof IJukebox))
+			return true;
+
+		CustomJukebox jukebox = getJukeboxAtLocation(blockLocation);
+		if (jukebox != null)
 		{
-			CustomJukebox jukebox = getJukeboxAtLocation(blockLocation);
-			if (jukebox != null)
-			{
-				stopJukebox(jukebox);
-				return false;
-			}
-			else
-			{
-				if (usingItem != null)
-				{
-					if (usingItem.is(Item.Special.Crafted.EnchantedBook))
-					{
-						if (this.isCustomRecord(usingItem))
-						{
-							((IJukebox) targetBlock).eject();
-							player.removeExactItem(usingItem, 1);
-							jukebox = playJukebox(player, new CustomJukebox(blockLocation, usingItem));
-							repository.storeJukebox(blockLocation, usingItem);
-							jukeboxes.add(jukebox);
-							return false;
-						}
-					}
-				}
-			}
+			stopJukebox(jukebox);
+			return false;
 		}
-		return true;
+
+		if (usingItem == null || !usingItem.is(Item.Special.Crafted.EnchantedBook) || !isCustomRecord(usingItem))
+			return true;
+
+		((IJukebox) targetBlock).eject();
+		player.removeExactItem(usingItem, 1);
+		jukebox = playJukebox(player, new CustomJukebox(blockLocation, usingItem));
+		repository.storeJukebox(blockLocation, usingItem);
+		jukeboxes.add(jukebox);
+		return false;
 	}
 
 	@Override
